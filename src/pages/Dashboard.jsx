@@ -18,21 +18,35 @@ function Dashboard() {
 
   useEffect(() => {
     const fetchData = async () => {
-      // Gọi API
       const user = await fetchUserAPI()
-      // Update lại thông tin user trong state component
       setUser(user)
     }
     fetchData()
   }, [])
 
   const handleLogout = async () => {
-    // Gọi APi
     await logoutAPI(user._id)
+
     // Xóa thông tin user trong LocalStorage phía Front-end
     localStorage.removeItem('userInfo')
+
     // Điều hướng tới trang Login khi Logout thành công
     navigate('/login')
+  }
+
+  const handleSuccessSetup2FA = async (updatedUser) => {
+    // Cập nhật các thông tin mới nhất của người dùng sau khi xác thực 2FA
+    setUser(updatedUser)
+    localStorage.setItem('userInfo', JSON.stringify(updatedUser))
+
+    // Đóng cái modal lại
+    setOpenSetup2FA(false)
+  }
+
+  const handleSuccessVerify2FA = async (updatedUser) => {
+    // Cập nhật các thông tin mới nhất của người dùng sau khi xác thực 2FA
+    setUser(updatedUser)
+    localStorage.setItem('userInfo', JSON.stringify(updatedUser))
   }
 
   if (!user) {
@@ -61,16 +75,25 @@ function Dashboard() {
       gap: 1,
       padding: '0 1em'
     }}>
-      {/* Modal để user cài đặt 2FA */}
+
+      {/* Hiển thị Modal để user cài đặt 2FA */}
       <Setup2FA
         isOpen={openSetup2FA}
         toggleOpen={setOpenSetup2FA}
+        user={user}
+        handleSuccessSetup2FA={handleSuccessSetup2FA}
       />
 
       {/* Modal yêu cầu xác thực 2FA */}
       {/* Với điều kiện user đã bật tính năng 2FA, và user chưa xác thực 2FA ngay sau khi đăng nhập ở lần tiếp theo */}
       {/* <Require2FA /> */}
-      {/* {user.require_2fa && !user.is_2fa_verified && <Require2FA />} */}
+      {
+        user.require_2fa && !user.is_2fa_verified &&
+        <Require2FA
+          user={user}
+          handleSuccessVerify2FA={handleSuccessVerify2FA}
+        />
+      }
 
       <Box>
         <a style={{ color: 'inherit', textDecoration: 'none' }} href='https://youtube.com/@nguyentrungkien' target='_blank' rel='noreferrer'>

@@ -7,9 +7,9 @@ import Typography from '@mui/material/Typography'
 import SecurityIcon from '@mui/icons-material/Security'
 import TextField from '@mui/material/TextField'
 import Button from '@mui/material/Button'
+import { verify2FA_API } from '~/apis'
 
-// Tài liệu về Material Modal rất dễ ở đây: https://mui.com/material-ui/react-modal/
-function Require2FA() {
+function Require2FA({ user, handleSuccessVerify2FA }) {
   const [otpToken, setConfirmOtpToken] = useState('')
   const [error, setError] = useState(null)
 
@@ -20,8 +20,18 @@ function Require2FA() {
       toast.error(errMsg)
       return
     }
-    console.log('handleRequire2FA > otpToken: ', otpToken)
-    // Call API here
+
+    // Mỗi lần thực hiện đăng nhập lại là phải bật modal xác thực 2FA
+    verify2FA_API(user._id, otpToken).then((updatedUser) => {
+      // Gọi lên component cha (Dashboard) để xử lý tiếp khi thành công
+      handleSuccessVerify2FA(updatedUser)
+
+      // Hiển thị thông báo thành công
+      toast.success('2FA Verified successfully')
+
+      // Clear all error
+      setError(null)
+    })
   }
 
   return (

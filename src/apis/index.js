@@ -25,3 +25,18 @@ export const fetchUserAPI = async () => {
 
   return user
 }
+
+export const get2FA_QRCodeAPI = async (userId) => {
+  const res = await authorizedAxiosInstance.get(`${API_ROOT}/v1/users/${userId}/get_2fa_qr_code`)
+  return res.data
+}
+
+export const setup2FA_API = async (userId, otpToken) => {
+  const res = await authorizedAxiosInstance.post(`${API_ROOT}/v1/users/${userId}/setup_2fa`, { otpToken })
+  return res.data
+}
+
+export const verify2FA_API = async (userId, otpToken) => {
+  const res = await authorizedAxiosInstance.put(`${API_ROOT}/v1/users/${userId}/verify_2fa`, { otpToken })
+  return res.data
+}
